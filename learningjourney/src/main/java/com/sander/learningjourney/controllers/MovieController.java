@@ -15,7 +15,10 @@ public class MovieController {
 
     @GetMapping("{name}")
     public ResponseEntity<Movie> getMovie(@PathVariable("name") String movieName) throws NotFoundException {
-        var movie = movieService.getMovie(movieName);
-        return ResponseEntity.ok(movie);
+        try {
+            return ResponseEntity.ok(movieService.getMovie(movieName));
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

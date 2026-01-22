@@ -15,11 +15,8 @@ import tools.jackson.databind.ObjectMapper;
 public class MovieService {
 
     private final String endpoint;
-
     private final String key;
-
     private final RestService restService;
-
     private final ObjectMapper objectMapper;
 
     public MovieService(
