@@ -16,7 +16,6 @@ public class MovieController {
     @GetMapping("{name}")
     public ResponseEntity<Movie> getMovie(@PathVariable("name") String movieName) throws NotFoundException {
         var movie = movieService.getMovie(movieName);
-        System.out.println(movie);
         return ResponseEntity.ok(movie);
     }
 }

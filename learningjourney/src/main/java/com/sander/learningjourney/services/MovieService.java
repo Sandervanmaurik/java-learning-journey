@@ -14,10 +14,8 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 public class MovieService {
 
-    @Value("${omdb.api.endpoint}")
     private final String endpoint;
 
-    @Value("${omdb.api.key}")
     private final String key;
 
     private final RestService restService;
@@ -39,7 +37,6 @@ public class MovieService {
         String url = endpoint + "?apiKey=" + key + "&t=" + name;
         var response = this.restService.get(url)
                 .orElseThrow(() -> new NotFoundException("Movie not found: " + name));
-        System.out.println(response);
 
         try {
             Movie movieResponse = objectMapper.readValue(response, Movie.class);
