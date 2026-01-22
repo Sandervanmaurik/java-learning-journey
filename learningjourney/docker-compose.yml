@@ -1,0 +1,11 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: learning-journey-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: security_users
+    ports:
+      - '3306:3306'
+    volumes:
+      - /var/lib/mysql
