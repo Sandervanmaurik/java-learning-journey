@@ -88,7 +88,23 @@ class MovieServiceTest {
 
     @Test
     void getMovie_UnparsableResponse_throwsNotFoundException() {
-        String rawJson = "{'invalid':'json'}";
+        String rawJson = "bad response";
+
+        String movieName = "Inception";
+        String url = ENDPOINT + "?apiKey=" + KEY + "&t=" + movieName;
+        when(restService.get(url)).thenReturn(Optional.of(rawJson));
+
+        try {
+            movieService.getMovie(movieName);
+        } catch (Exception e) {
+            assertThat(e).isInstanceOf(NotFoundException.class)
+                         .hasMessage("Failed to parse movie response");
+        }
+    }
+
+        @Test
+    void getMovie_UnknownResponse_throwsNotFoundException() {
+        String rawJson = "{'unknown':'fields'}";
 
         String movieName = "Inception";
         String url = ENDPOINT + "?apiKey=" + KEY + "&t=" + movieName;
