@@ -1,5 +1,6 @@
 package com.sander.learningjourney.controllers;
 
+import com.sander.learningjourney.exceptions.NotFoundException;
 import com.sander.learningjourney.models.Movie;
 import com.sander.learningjourney.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ public class MovieController {
     private MovieService movieService;
 
     @GetMapping("{name}")
-    public ResponseEntity<Movie> getMovie(@PathVariable("name") String movieName) {
+    public ResponseEntity<Movie> getMovie(@PathVariable("name") String movieName) throws NotFoundException {
         var movie = movieService.getMovie(movieName);
         System.out.println(movie);
         return ResponseEntity.ok(movie);
