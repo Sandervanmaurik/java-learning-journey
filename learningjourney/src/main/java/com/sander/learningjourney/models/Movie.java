@@ -6,6 +6,8 @@ import tools.jackson.databind.annotation.JsonNaming;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 @Data
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 public class Movie {
@@ -25,11 +27,20 @@ public class Movie {
     private String poster;
     private List<Rating> ratings;
     private String metascore;
+
+    @JsonAlias("imdbRating")
     private String imdbRating;
+
+    @JsonAlias("imdbVotes")
     private String imdbVotes;
+
+    @JsonAlias("imdbID")
     private String imdbID;
-    private String type;
+
+    @JsonAlias("DVD")
     private String dvd;
+
+    private String type;
     private String boxOffice;
     private String production;
     private String website;

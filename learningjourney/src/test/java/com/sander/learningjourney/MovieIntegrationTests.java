@@ -17,7 +17,7 @@ public class MovieIntegrationTests {
     }
 
     @Test
-    void testGetMovie() {
+    void getMovie() {
         restTestClient.get()
                 .uri("/movies/{name}", "inception")
                 .exchange()
@@ -25,7 +25,7 @@ public class MovieIntegrationTests {
     }
 
     @Test
-    void testGetNonExistentMovie() {
+    void getNonExistentMovie() {
         restTestClient.get()
                 .uri("/movies/{name}", "non-existent-movie")
                 .exchange()

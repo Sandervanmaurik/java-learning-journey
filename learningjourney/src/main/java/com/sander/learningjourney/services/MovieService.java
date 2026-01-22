@@ -5,9 +5,9 @@ import com.sander.learningjourney.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.json.JsonParseException;
 import org.springframework.stereotype.Service;
 
+import tools.jackson.core.exc.StreamReadException;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
@@ -45,9 +45,9 @@ public class MovieService {
                 throw new NotFoundException("Movie not found: " + name);
             }
             return movieResponse;
-        } catch (JsonParseException e) {
+        } catch (StreamReadException e) {
             log.warn("Movie response can not be parsed");
-            throw new IllegalStateException("Failed to parse movie response", e);
+            throw new NotFoundException("Failed to parse movie response");
         }
     }
 }
