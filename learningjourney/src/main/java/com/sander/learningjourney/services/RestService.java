@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 @Service
-class RestService {
+public class RestService {
     private RestClient restClient;
 
     private void createRestClient() {
