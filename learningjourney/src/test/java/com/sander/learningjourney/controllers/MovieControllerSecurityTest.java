@@ -50,7 +50,7 @@ class MovieControllerSecurityTest {
     @WithUserDetails("user")
     void getMovie_whenUserAuthenticated_returnsUnauthorized() throws Exception {
         mockMvc.perform(get("/movies/inception").with(testSecurityContext()))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
