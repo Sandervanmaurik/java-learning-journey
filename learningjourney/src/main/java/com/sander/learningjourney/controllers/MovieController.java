@@ -1,7 +1,7 @@
 package com.sander.learningjourney.controllers;
 
 import com.sander.learningjourney.exceptions.NotFoundException;
-import com.sander.learningjourney.models.Movie;
+import com.sander.learningjourney.models.MovieSummary;
 import com.sander.learningjourney.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ public class MovieController {
 
     @GetMapping("{name}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Movie> getMovie(@PathVariable("name") String movieName) throws NotFoundException {
+    public ResponseEntity<MovieSummary> getMovie(@PathVariable("name") String movieName) throws NotFoundException {
         try {
             return ResponseEntity.ok(movieService.getMovie(movieName));
         } catch (NotFoundException e) {
