@@ -1,25 +1,23 @@
 package com.sander.learningjourney.services;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 @Service
-class RestService {
+public class RestService {
+    private final RestClient restClient;
 
-    private RestClient restClient;
-
-    private void createRestClient() {
-        restClient = RestClient.create();
+    public RestService(RestClient.Builder builder) {
+        this.restClient = builder.build();
     }
 
-    public <T> T get(String url, Class<T> responseType) {
-        if (restClient == null) {
-            createRestClient();
-        }
-        
-        return restClient.get()
+    public Optional<String> get(String url) {
+        String body = restClient.get()
                 .uri(url)
                 .retrieve()
-                .body(responseType);
+                .body(String.class);
+        return Optional.ofNullable(body);
     }
 }

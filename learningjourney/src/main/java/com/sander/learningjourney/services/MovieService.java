@@ -1,25 +1,50 @@
 package com.sander.learningjourney.services;
 
 import com.sander.learningjourney.models.Movie;
+import com.sander.learningjourney.exceptions.NotFoundException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.databind.ObjectMapper;
+
 @Service
+@Slf4j
 public class MovieService {
 
-    @Value("${omdb.api.endpoint}")
-    private String endpoint;
+    private final String endpoint;
+    private final String key;
+    private final RestService restService;
+    private final ObjectMapper objectMapper;
 
-    @Value("${omdb.api.key}")
-    private String key;
+    public MovieService(
+            @Value("${omdb.api.endpoint}") String endpoint,
+            @Value("${omdb.api.key}") String key,
+            RestService restService,
+            ObjectMapper objectMapper) {
+        this.endpoint = endpoint;
+        this.key = key;
+        this.restService = restService;
+        this.objectMapper = objectMapper;
+    }
 
-    @Autowired
-    private RestService restService;
-
-    public Movie getMovie(String name) {
+    public Movie getMovie(String name) throws NotFoundException {
         String url = endpoint + "?apiKey=" + key + "&t=" + name;
-        return this.restService.get(url, Movie.class);
+        final var response = this.restService.get(url)
+                .orElseThrow(() -> new NotFoundException("Movie not found: " + name, null));
+
+        try {
+            final Movie movieResponse = objectMapper.readValue(response, Movie.class);
+            if (movieResponse.isFailure()) {
+                log.warn("Movie not found: {}", name);
+                throw new NotFoundException("Movie not found: " + name, null);
+            }
+            return movieResponse;
+        } catch (StreamReadException e) {
+            log.warn("Movie response can not be parsed");
+            throw new NotFoundException("Failed to parse movie response", e);
+        }
     }
 }
