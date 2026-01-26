@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/movies")
 public class MovieController {
+
     @Autowired
     private MovieService movieService;
 
