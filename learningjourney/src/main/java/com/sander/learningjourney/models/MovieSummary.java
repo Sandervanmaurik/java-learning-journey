@@ -1,5 +1,6 @@
 package com.sander.learningjourney.models;
 
+import java.util.Arrays;
 import java.util.List;
 
 import lombok.Builder;
@@ -11,10 +12,10 @@ public record MovieSummary(
         String rated,
         String released,
         String runtime,
-        String genre,
+        List<String> genre,
         String director,
         String writer,
-        String actors,
+        List<String> actors,
         String plot,
         String language,
         String country,
@@ -41,10 +42,10 @@ public record MovieSummary(
                 .rated(movie.getRated())
                 .released(movie.getReleased())
                 .runtime(movie.getRuntime())
-                .genre(movie.getGenre())
+                .genre(splitCommaSeparated(movie.getGenre()))
                 .director(movie.getDirector())
                 .writer(movie.getWriter())
-                .actors(movie.getActors())
+                .actors(splitCommaSeparated(movie.getActors()))
                 .plot(movie.getPlot())
                 .language(movie.getLanguage())
                 .country(movie.getCountry())
@@ -61,5 +62,15 @@ public record MovieSummary(
                 .production(movie.getProduction())
                 .website(movie.getWebsite())
                 .build();
+    }
+
+    private static List<String> splitCommaSeparated(String value) {
+        if (value == null || value.isBlank()) {
+            return List.of();
+        }
+        return Arrays.stream(value.split(","))
+                .map(String::trim)
+                .filter(item -> !item.isBlank())
+                .toList();
     }
 }
