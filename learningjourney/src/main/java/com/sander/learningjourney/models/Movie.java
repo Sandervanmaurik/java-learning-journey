@@ -11,6 +11,9 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 @Data
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 public class Movie {
+    private static final String RESPONSE_SUCCESS = "True";
+    private static final String RESPONSE_FAILURE = "False";
+
     private String title;
     private String year;
     private String rated;
@@ -45,4 +48,12 @@ public class Movie {
     private String production;
     private String website;
     private String response;
+
+    public boolean isSuccess() {
+        return RESPONSE_SUCCESS.equalsIgnoreCase(response);
+    }
+
+    public boolean isFailure() {
+        return RESPONSE_FAILURE.equalsIgnoreCase(response);
+    }
 }

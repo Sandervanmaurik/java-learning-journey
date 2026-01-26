@@ -1,9 +1,14 @@
 package com.sander.learningjourney.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,16 +40,10 @@ class MovieServiceTest {
     }
 
     @Test
-    void getMovie_parsesResponse() throws Exception {
-        String rawJson = """
-                {"Title":"Inception","Year":"2010","Rated":"PG-13","Released":"16 Jul 2010","Runtime":"148 min","Genre":"Action, Adventure, Sci-Fi","Director":"Christopher Nolan","Writer":"Christopher Nolan","Actors":"Leonardo DiCaprio, Joseph Gordon-Levitt, Elliot Page","Plot":"A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO, but his tragic past may doom the project and his team to disaster.","Language":"English, Japanese, French","Country":"United States, United Kingdom","Awards":"Won 4 Oscars. 159 wins & 220 nominations total","Poster":"https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"8.8/10"},{"Source":"Rotten Tomatoes","Value":"87%"},{"Source":"Metacritic","Value":"74/100"}],"Metascore":"74","imdbRating":"8.8","imdbVotes":"2,767,518","imdbID":"tt1375666","Type":"movie","DVD":"N/A","BoxOffice":"$292,587,330","Production":"N/A","Website":"N/A","Response":"True"}
-                """;
+    void deserializeFromJson_parsesAllFields_correctly() throws Exception {
+        String json = loadJsonResource("data/omdb/inception.json");
 
-        String movieName = "Inception";
-        String url = ENDPOINT + "?apiKey=" + KEY + "&t=" + movieName;
-        when(restService.get(url)).thenReturn(Optional.of(rawJson));
-
-        Movie movie = movieService.getMovie(movieName);
+        Movie movie = new ObjectMapper().readValue(json, Movie.class);
 
         Movie expected = new Movie();
         expected.setTitle("Inception");
@@ -56,11 +55,13 @@ class MovieServiceTest {
         expected.setDirector("Christopher Nolan");
         expected.setWriter("Christopher Nolan");
         expected.setActors("Leonardo DiCaprio, Joseph Gordon-Levitt, Elliot Page");
-        expected.setPlot("A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO, but his tragic past may doom the project and his team to disaster.");
+        expected.setPlot(
+                "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO, but his tragic past may doom the project and his team to disaster.");
         expected.setLanguage("English, Japanese, French");
         expected.setCountry("United States, United Kingdom");
         expected.setAwards("Won 4 Oscars. 159 wins & 220 nominations total");
-        expected.setPoster("https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg");
+        expected.setPoster(
+                "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg");
         expected.setMetascore("74");
         expected.setImdbRating("8.8");
         expected.setImdbVotes("2,767,518");
@@ -87,6 +88,21 @@ class MovieServiceTest {
     }
 
     @Test
+    void getMovie_whenApiReturnsSuccess_returnsMovie() {
+        String json = "{\"Response\":\"True\",\"Title\":\"Inception\"}";
+
+        String movieName = "Inception";
+        String url = ENDPOINT + "?apiKey=" + KEY + "&t=" + movieName;
+
+        when(restService.get(url)).thenReturn(Optional.of(json));
+
+        Movie movie = movieService.getMovie(movieName);
+
+        assertThat(movie).isNotNull();
+        assertThat(movie.isSuccess()).isTrue();
+    }
+
+    @Test
     void getMovie_UnparsableResponse_throwsNotFoundException() {
         String rawJson = "bad response";
 
@@ -94,15 +110,12 @@ class MovieServiceTest {
         String url = ENDPOINT + "?apiKey=" + KEY + "&t=" + movieName;
         when(restService.get(url)).thenReturn(Optional.of(rawJson));
 
-        try {
-            movieService.getMovie(movieName);
-        } catch (Exception e) {
-            assertThat(e).isInstanceOf(NotFoundException.class)
-                         .hasMessage("Failed to parse movie response");
-        }
+        assertThatThrownBy(() -> movieService.getMovie(movieName))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Failed to parse movie response");
     }
 
-        @Test
+    @Test
     void getMovie_UnknownResponse_throwsNotFoundException() {
         String rawJson = "{'unknown':'fields'}";
 
@@ -110,11 +123,16 @@ class MovieServiceTest {
         String url = ENDPOINT + "?apiKey=" + KEY + "&t=" + movieName;
         when(restService.get(url)).thenReturn(Optional.of(rawJson));
 
-        try {
-            movieService.getMovie(movieName);
-        } catch (Exception e) {
-            assertThat(e).isInstanceOf(NotFoundException.class)
-                         .hasMessage("Failed to parse movie response");
+        assertThatThrownBy(() -> movieService.getMovie(movieName))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Failed to parse movie response");
+    }
+
+    private String loadJsonResource(String path) throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        try (InputStream inputStream = Objects.requireNonNull(classLoader.getResourceAsStream(path),
+                "Missing test resource: " + path)) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 }

@@ -32,19 +32,19 @@ public class MovieService {
 
     public Movie getMovie(String name) throws NotFoundException {
         String url = endpoint + "?apiKey=" + key + "&t=" + name;
-        var response = this.restService.get(url)
-                .orElseThrow(() -> new NotFoundException("Movie not found: " + name));
+        final var response = this.restService.get(url)
+                .orElseThrow(() -> new NotFoundException("Movie not found: " + name, null));
 
         try {
-            Movie movieResponse = objectMapper.readValue(response, Movie.class);
-            if (movieResponse != null && "False".equals(movieResponse.getResponse())) {
+            final Movie movieResponse = objectMapper.readValue(response, Movie.class);
+            if (movieResponse.isFailure()) {
                 log.warn("Movie not found: {}", name);
-                throw new NotFoundException("Movie not found: " + name);
+                throw new NotFoundException("Movie not found: " + name, null);
             }
             return movieResponse;
         } catch (StreamReadException e) {
             log.warn("Movie response can not be parsed");
-            throw new NotFoundException("Failed to parse movie response");
+            throw new NotFoundException("Failed to parse movie response", e);
         }
     }
 }

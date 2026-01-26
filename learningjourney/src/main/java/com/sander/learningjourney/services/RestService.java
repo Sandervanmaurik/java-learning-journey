@@ -7,17 +7,13 @@ import org.springframework.web.client.RestClient;
 
 @Service
 public class RestService {
-    private RestClient restClient;
+    private final RestClient restClient;
 
-    private void createRestClient() {
-        restClient = RestClient.create();
+    public RestService(RestClient.Builder builder) {
+        this.restClient = builder.build();
     }
 
     public Optional<String> get(String url) {
-        if (restClient == null) {
-            createRestClient();
-        }
-
         String body = restClient.get()
                 .uri(url)
                 .retrieve()
