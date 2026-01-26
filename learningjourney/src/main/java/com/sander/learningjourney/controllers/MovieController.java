@@ -5,6 +5,7 @@ import com.sander.learningjourney.models.Movie;
 import com.sander.learningjourney.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +16,7 @@ public class MovieController {
     private MovieService movieService;
 
     @GetMapping("{name}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Movie> getMovie(@PathVariable("name") String movieName) throws NotFoundException {
         try {
             return ResponseEntity.ok(movieService.getMovie(movieName));
