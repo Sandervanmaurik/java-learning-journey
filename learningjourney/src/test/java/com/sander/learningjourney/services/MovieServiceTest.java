@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.sander.learningjourney.exceptions.NotFoundException;
 import com.sander.learningjourney.models.Movie;
+import com.sander.learningjourney.models.MovieSummary;
 import com.sander.learningjourney.models.Rating;
 
 import tools.jackson.databind.ObjectMapper;
@@ -96,10 +97,10 @@ class MovieServiceTest {
 
         when(restService.get(url)).thenReturn(Optional.of(json));
 
-        Movie movie = movieService.getMovie(movieName);
+        MovieSummary movie = movieService.getMovie(movieName);
 
         assertThat(movie).isNotNull();
-        assertThat(movie.isSuccess()).isTrue();
+        assertThat(movie.title()).isEqualTo("Inception");
     }
 
     @Test

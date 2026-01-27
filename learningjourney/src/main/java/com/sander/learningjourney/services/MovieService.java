@@ -1,6 +1,7 @@
 package com.sander.learningjourney.services;
 
 import com.sander.learningjourney.models.Movie;
+import com.sander.learningjourney.models.MovieSummary;
 import com.sander.learningjourney.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class MovieService {
         this.objectMapper = objectMapper;
     }
 
-    public Movie getMovie(String name) throws NotFoundException {
+    public MovieSummary getMovie(String name) throws NotFoundException {
         String url = endpoint + "?apiKey=" + key + "&t=" + name;
         final var response = this.restService.get(url)
                 .orElseThrow(() -> new NotFoundException("Movie not found: " + name, null));
@@ -41,7 +42,7 @@ public class MovieService {
                 log.warn("Movie not found: {}", name);
                 throw new NotFoundException("Movie not found: " + name, null);
             }
-            return movieResponse;
+            return MovieSummary.from(movieResponse);
         } catch (StreamReadException e) {
             log.warn("Movie response can not be parsed");
             throw new NotFoundException("Failed to parse movie response", e);
